@@ -3,11 +3,13 @@
 #include <cstdlib>
 #include <ctime>
 #include <memory>
+#include <typeinfo>
 
 using namespace std;
 
 // Interfaces
-class ICard {
+class ICard
+{
 	public:
 		virtual int getValue () const = 0;
 		virtual ~ICard (){}
@@ -28,6 +30,7 @@ class IPlayer
 		virtual bool init () = 0;
 		virtual void pickCard (ICardDeck &) = 0;
 		virtual int totalValue () = 0;
+		virtual bool isBusted () = 0;
 		virtual ~IPlayer () {}
 };
 
@@ -37,10 +40,10 @@ class IGame
 		virtual bool init () = 0;
 		// Consider there only one player and dealer for starters
 		// virtual bool addPlayer (IPlayer &player) = 0;
-		virtual bool addDeck (ICardDeck &deck) = 0;
+		virtual bool addDeck (shared_ptr <ICardDeck> sptrDdeck) = 0;
 		virtual bool play () = 0;
 		virtual void displayResult () = 0;
-		virtual ~IGame ();
+		virtual ~IGame () {}
 };
 
 // BlackJack implementation
@@ -57,7 +60,7 @@ class BJCard : public ICard
 			Last
 		};
 
-		BJCard () {}
+		BJCard ():val(-1) {}
 		BJCard (int iValue, string sName):val(iValue),name(sName) 
 		{}
 
@@ -130,7 +133,7 @@ class AceCard: public BJCard
 			return *this;
 		}
 
-		int getValue ()
+		int getValue () const
 		{
 			return 1;	
 		}
@@ -145,7 +148,7 @@ class AceCard: public BJCard
 class BJCardDeck : public ICardDeck
 {
 	private:
-		vector<shared_ptr <BJCard> >  deck;
+		vector<shared_ptr <ICard> > deck;
 
 		string getFlower (int i) 
 		{
@@ -176,13 +179,13 @@ class BJCardDeck : public ICardDeck
 				for (int j = 1; j < 11; j++) {
 					if (j == 1) 
 					{
-						shared_ptr<BJCard> ptrCard(new AceCard (flower));
+						shared_ptr<ICard> ptrCard(new AceCard (flower));
 						deck.push_back (ptrCard);
 					} else 
 					{
 						string name = flower + " " + to_string (j);
 						
-						shared_ptr<BJCard> ptrCard(new BJCard (j, name)); 
+						shared_ptr<ICard> ptrCard(new BJCard (j, name)); 
 						deck.push_back (ptrCard);
 					}
 
@@ -232,6 +235,7 @@ ostream & operator<< (ostream &out, BJCardDeck &cdeck)
 	for (auto i : cdeck.deck)
 	{
 		out << i->getValue () << " ";
+		//out << typeid(i).name () << " \n";
 	}
 	out << endl;
 
@@ -244,7 +248,7 @@ class BJPlayer : public IPlayer
 		vector < shared_ptr<ICard> > cards;
 		string name;
 	public:
-		BJPlayer (string &sName):name (sName) {}
+		BJPlayer (string sName):name (sName) {}
 
 		bool init ()
 		{
@@ -255,33 +259,103 @@ class BJPlayer : public IPlayer
 			auto card = deck.getCard ();
 			cards.push_back (card);
 
-			cout << "Picked up the card " << card->getValue ();
+			cout << name << " Picked up the card " << card->getValue () << endl;
 		}
 
 		int totalValue ()
 		{
+			int total = 0;
+			int numAces = 0;
+
+			for (auto i : cards) {
+				if (dynamic_pointer_cast<AceCard>(i))
+					numAces++;
+
+				total += i->getValue ();
+			}
+
+			if (numAces == 1 && total <= 11)
+				total += 10; // Ace value becomes 11, since 1 is already counted, just added 10
+			// Ideally we should have used the AceCard->getMaxValue function for this purpose
+
+			return total;
+		}
+
+		// Could be optimized by caching the totalValue and invalidating it
+		// when a player picks up a card
+		bool isBusted ()
+		{
+			if (totalValue () > 21)
+				return true;
+			else 
+				return false;
 		}
 };
 
+// Consider there is only one player and a dealer in the game
 class BJGame : public IGame
 {
 		private:
+			vector < shared_ptr<ICardDeck > > sptrDecks;
+			const int rounds = 26;
+			BJPlayer dealer, player;
 		public:
+		
+		BJGame ():dealer ("Dealer"), player ("chen") {}
+			
 		bool init ()
 		{
+			dealer.init ();
+			player.init ();
 		}
 		
 		// Consider there only one player and dealer for starters
 		// virtual bool addPlayer (IPlayer &player) = 0;
-		bool addDeck (ICardDeck &deck) 
+		bool addDeck (shared_ptr<ICardDeck> sptrDeck) 
 		{
+			sptrDecks.push_back (sptrDeck);
+
+			return true;
 		}
 		bool play ()
 		{
+			if (sptrDecks.empty ())
+				return false;
+
+			for (int i = 0; i < rounds; i++) 
+			{
+				cout << "\nRound " << i+1 << endl;
+				if (player.totalValue () == 21 || dealer.totalValue () == 21)
+					return true;
+
+				if (dealer.isBusted () || player.isBusted ())
+					return true;
+				
+				// Picks only from first deck, we could increase the players
+				// and allow picking up from different decks
+				dealer.pickCard (*(sptrDecks[0]));
+				player.pickCard (*(sptrDecks[0]));
+			}
+
+			return false;
 		}
 		
 		void displayResult ()
 		{
+			int playerTotal = player.totalValue ();
+			int dealerTotal = dealer.totalValue ();
+
+			if ((playerTotal == 21 && dealerTotal == 21) || 
+					(playerTotal > 21 && dealerTotal > 21))
+				cout << "Match ends in a draw" << endl;
+
+			if (playerTotal <= 21)
+				cout << "Player wins!! " << endl;
+			else
+				cout << "Dealer wins :( " << endl;
+
+			cout << "Player's Total - " << playerTotal << endl;
+			cout << "Dealer's Total - " << dealerTotal << endl;
 		}
 
 };
@@ -289,14 +363,21 @@ class BJGame : public IGame
 int
 main ()
 {
-	BJCardDeck bcDeck;
+	shared_ptr<BJCardDeck> bcDeck = shared_ptr <BJCardDeck> (new BJCardDeck ());
 
 	srand(time(NULL));
 	
-	bcDeck.init ();
-	cout << bcDeck;
-	bcDeck.shuffle ();
-	cout << bcDeck;
+	bcDeck->init ();
+	bcDeck->shuffle ();
+	cout << *bcDeck;
+
+	auto game = shared_ptr<IGame> (new BJGame ());
+	game->addDeck (bcDeck);
+	game->init ();
+	game->play ();
+	game->displayResult ();
+
+	cout << endl;
 
 	return 0;	
 }
