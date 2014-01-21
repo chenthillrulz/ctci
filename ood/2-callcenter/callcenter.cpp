@@ -214,8 +214,9 @@ class CallConnector
 			return nullptr;
 		}
 
-		/* Note: If there is a org hierarchy such as a set of employees will have a single manager,
-		   Respondent class keep a reference to a manager and manager->Director, creating a tree like structure */
+		// Note: If there is a org hierarchy such as a set of employees will have a single manager,
+		// Respondent class can keep a reference to a manager and manager->Director, creating a tree like structure
+		// and this class would then just have a list of respondents
 		list<shared_ptr <Employee> > respondents;
 		list<shared_ptr <Employee> > managers;
 		list<shared_ptr <Employee> > directors;
