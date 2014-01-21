@@ -50,6 +50,8 @@ class Call
 		CallStatus status;
 };
 
+// One other idea is to have a Employee Level or rank inside Employee class itself
+// and Allow the derived classes to just override and set their own ranks.
 class Employee
 {
 	public:
