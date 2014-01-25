@@ -41,6 +41,8 @@ main (int argc, char *argv[])
 	int two_d_arr [x+1] [y+1];
 	int *p [y+1];
 
+	// To avoid this, one could possibly use a $ vector vector< vector <int> > twod_vector;
+	// and pass it as a reference to the count_steps function
 	for (int i = 0; i < y+1; i++)
 		p[i] = two_d_arr[i]; 
 
