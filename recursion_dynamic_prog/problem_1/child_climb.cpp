@@ -35,8 +35,12 @@ main (int argc, char *argv[])
 	vector <int> possible_steps;
 	int nSteps;
 
-	cout << "Enter the number of steps " << endl;
+	cout << "Enter the number of steps as a positive integer greater than zero " << endl;
 	cin >> nSteps;
+	if (nSteps <= 0) {
+		cout << "Invalid argument  - " << nSteps << endl;
+		return -1;
+	}
 
 	possible_steps.push_back (3);
 	possible_steps.push_back (2);
