@@ -15,7 +15,16 @@ struct Coordinates
 	Coordinates (int iX, int iY):x(iX), y(iY)
 	{
 	}
+
+	friend ostream & operator<< (ostream &, Coordinates &);
 };
+
+ostream & operator<< (ostream &out, Coordinates &c)
+{
+	out << "Coordinates " << c.x << "," << c.y << endl;
+
+	return out;
+}
 
 int 
 main (int argc, char *argv[])
@@ -40,15 +49,23 @@ main (int argc, char *argv[])
 		Coordinates move_right (current.x+1, current.y);
 		Coordinates move_down (current.x, current.y-1);
 
-		if (move_right.x <= target_x)
+		if (move_right.x <= target_x) {
+			cout << "pushing ";
 			cQueue.push (move_right);
+			cout << move_right;
+		}
 
-		if (move_down.y >= target_y)
+		if (move_down.y >= target_y) {
+			cout << "pushing" ;
 			cQueue.push (move_down);
+			cout << move_down;	
+		}
 
 		if (current.x == target_x && current.y == target_y)
 			count_ways++;
 
+		cout << "poping";
+		cout << current;
 		cQueue.pop ();
 	}
 
