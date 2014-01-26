@@ -46,27 +46,29 @@ main (int argc, char *argv[])
 
 	while (cQueue.empty () == false) {
 		Coordinates current = cQueue.front ();
+		
+		// Pop immediately without a delay. Interchanging queue stack reveals the problem of leaving it to later
+		cout << "-- ";
+		cout << current;
+		cQueue.pop ();
+		
 		Coordinates move_right (current.x+1, current.y);
 		Coordinates move_down (current.x, current.y-1);
 
 		if (move_right.x <= target_x) {
-			cout << "pushing ";
+			cout << "++ ";
 			cQueue.push (move_right);
 			cout << move_right;
 		}
 
 		if (move_down.y >= target_y) {
-			cout << "pushing" ;
+			cout << "++ " ;
 			cQueue.push (move_down);
 			cout << move_down;	
 		}
 
 		if (current.x == target_x && current.y == target_y)
 			count_ways++;
-
-		cout << "poping";
-		cout << current;
-		cQueue.pop ();
 	}
 
 	cout << "Number of possible ways to reach - " << count_ways << endl;
