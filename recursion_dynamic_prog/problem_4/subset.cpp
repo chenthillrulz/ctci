@@ -14,12 +14,10 @@ is_set_equal (shared_ptr<set<int>> a, shared_ptr<set<int>> b)
 	return (*a == *b);
 }
 
-
 static setList
 generate_sets (setList appendTo, shared_ptr< list<int> > individualItems)
 {
 	setList result;
-
 
 	for (auto i : *individualItems)
 	{
@@ -33,6 +31,8 @@ generate_sets (setList appendTo, shared_ptr< list<int> > individualItems)
 
 	// remove duplicates from result
 	result.unique (is_set_equal);
+
+	cout << "Number of subsets generated " << result.size () << endl;
 
 	if (result.size () != 1)
 	{
