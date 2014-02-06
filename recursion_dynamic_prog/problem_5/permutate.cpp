@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <boost/timer/timer.hpp>
 
 using namespace std;
 
@@ -32,13 +33,14 @@ int main ()
 	string input("permutate");
 	string outputBuilder("");
 	map<string,bool> results;
+	boost::timer::auto_cpu_timer t(3);
 
 	permutate (outputBuilder, input, results);
 
-	for (auto i : results)
+	/* for (auto i : results)
 	{
 		cout << i.first << endl;
-	}
+	} */
 
 	cout << "Number of permutations of the string " << results.size () << endl;
 	return 0;
