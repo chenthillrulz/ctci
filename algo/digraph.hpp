@@ -8,11 +8,11 @@ template <class T>
 class Node {
 	public:
 		T vertex;
-		set<Node *> *edges;
+		set<Node<T> *> *edges;
 
 		Node(T vert):vertex(vert)
 		{
-			edges = new set<Node *> ();
+			edges = new set<Node<T> *> ();
 		}
 
 		~Node ()
@@ -23,9 +23,8 @@ class Node {
 
 template <class T>
 class DiGraph {
-	private:
-		map<T, Node<T> *> *nodes;
 	public:
+		map<T, Node<T> *> *nodes;
 		DiGraph ()
 		{
 			nodes = new map<T, Node<T> *> ();
@@ -41,7 +40,7 @@ class DiGraph {
 		{
 			if (nodes->count (vertex) == 0) {
 				Node <T> *node = new Node<T> (vertex);
-				nodes.insert (pair<T, Node<T> *> (vertex, node));
+				nodes->insert (pair<T, Node<T> *> (vertex, node));
 			}
 		}
 
@@ -49,16 +48,15 @@ class DiGraph {
 		{
 			addVertex (v);
 			addVertex (w);
-			(nodes[v])->edges->insert (w);
+			(nodes->at(v))->edges->insert (nodes->at (w));
 		}
 
 		void addBiDirectionalEdge (T v, T w)
 		{
 			addVertex (v);
 			addVertex (w);
-			nodes[v]->edges->insert (w);
-			nodes[w]->edges->insert (v);
+			
+			(nodes->at(v))->edges->insert (nodes->at(w));
+			(nodes->at(w))->edges->insert (nodes->at(v));
 		}
-
-
 };
