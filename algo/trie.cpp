@@ -3,6 +3,8 @@
 #include <map>
 #include <list>
 #include <string>
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -127,6 +129,7 @@ int main (int argc, char *argv[])
 	
 	while (getline (inFile, word))
 	{
+		transform (word.begin(), word.end(), word.begin(), (int (*) (int)) tolower);
 		autoCompletionTrie.Insert (word);
 	}
 
@@ -135,7 +138,7 @@ int main (int argc, char *argv[])
 	{
 		cout << "Enter a prefix to autocomplete " << endl;
 		cin >> prefix;
-		if (prefix == "exit")
+		if (prefix == "EXIT")
 			break;
 
 		list<string> result;
