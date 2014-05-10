@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <list>
 #include <string>
@@ -110,27 +111,44 @@ class Trie
 };
 
 
-int main ()
+int main (int argc, char *argv[])
 {
 	int numWords;
-	Trie autoCompletionTrie;
+	string word;
 
-	cin >> numWords;
-	while (numWords--)
+	if (argc != 2) 
 	{
-		string word;
-		
-		cin >> word;
+		cout << "Usage: a.out input_filename " << endl;
+		return 1;
+	}
+
+	ifstream inFile(argv[1], ios::in);
+	Trie autoCompletionTrie;
+	
+	while (getline (inFile, word))
+	{
 		autoCompletionTrie.Insert (word);
 	}
 
-	list<string> result;
-	string prefix = "vik";
-	autoCompletionTrie.Search (prefix, &result, -1);
-
-	cout << "List of matches " << endl;
-	for (list<string>::iterator iter = result.begin(); iter != result.end(); iter++)
+	string prefix;	
+	while (true)
 	{
-		cout << *iter << endl;
+		cout << "Enter a prefix to autocomplete " << endl;
+		cin >> prefix;
+		if (prefix == "exit")
+			break;
+
+		list<string> result;
+		autoCompletionTrie.Search (prefix, &result, -1);
+		
+		cout << "List of matches " << endl;
+		for (list<string>::iterator iter = result.begin(); iter != result.end(); iter++)
+		{
+			cout << *iter << endl;
+		}
+		
+		cout << endl;
 	}
+	
+	return 0;
 }
