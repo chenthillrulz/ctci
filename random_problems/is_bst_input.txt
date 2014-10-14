@@ -1,0 +1,16 @@
+root
+8
+R
+10
+L
+3
+LR
+6
+LL
+1
+RL
+9
+RR
+14
+end
+
