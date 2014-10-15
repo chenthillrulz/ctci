@@ -141,5 +141,7 @@ int main (int argc, char *argv[])
 	cout << "Is tree a BST ? " << answer << endl;
 
 	// complexity analysis
+	// insertion O(nlogn), visualization - O(n), isBst - O(n)
+	// space 2 O(n)
 
 }
