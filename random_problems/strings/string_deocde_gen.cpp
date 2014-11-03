@@ -97,8 +97,8 @@ int main (int argc, char *argv[])
 	// 6*3*2*5*4 = 720 
 
 	// complexity analysis
-	// memory - 
-	// speed - O(mn) power n
+	// speed - its a geometric series. if m is a average lenght of hash map table for each character
+	// memory - O(mn) power n
 
 	// test cases used
 
